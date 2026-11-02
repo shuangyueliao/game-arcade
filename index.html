@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark">
+<meta name="description" content="Shuangyueliao Arcade — 23 free single-file browser games. Puzzle, arcade, action, word and idle. No installs, no ads-in-your-face, just play.">
+<title>Shuangyueliao Arcade — 23 Free Browser Games</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🕹️%3C/text%3E%3C/svg%3E">
+<style>
+  :root{
+    --bg:#05070f;
+    --panel:#0b1020;
+    --panel2:#0e1526;
+    --line:rgba(148,163,255,.14);
+    --text:#e7ecff;
+    --muted:#93a0c4;
+    --cyan:#22d3ee;
+    --pink:#f472b6;
+    --violet:#a78bfa;
+    --green:#34d399;
+    --amber:#fbbf24;
+    --red:#fb7185;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    min-height:100vh;
+    overflow-x:hidden;
+  }
+  /* ---- neon backdrop (pure CSS) ---- */
+  .bg{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
+  .bg::before{
+    content:"";position:absolute;inset:-2px;
+    background:
+      radial-gradient(600px 420px at 12% -10%,rgba(34,211,238,.16),transparent 60%),
+      radial-gradient(700px 480px at 92% 8%,rgba(244,114,182,.13),transparent 60%),
+      radial-gradient(640px 520px at 50% 118%,rgba(167,139,250,.13),transparent 60%);
+  }
+  .bg::after{
+    content:"";position:absolute;inset:0;opacity:.35;
+    background-image:
+      linear-gradient(rgba(148,163,255,.06) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(148,163,255,.06) 1px,transparent 1px);
+    background-size:44px 44px;
+    -webkit-mask-image:linear-gradient(to bottom,rgba(0,0,0,.9),transparent 75%);
+            mask-image:linear-gradient(to bottom,rgba(0,0,0,.9),transparent 75%);
+  }
+  .orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:.5;animation:drift 16s ease-in-out infinite alternate}
+  .orb.a{width:280px;height:280px;left:-80px;top:12%;background:rgba(34,211,238,.22)}
+  .orb.b{width:320px;height:320px;right:-100px;top:38%;background:rgba(244,114,182,.18);animation-delay:-6s}
+  .orb.c{width:260px;height:260px;left:38%;bottom:-120px;background:rgba(167,139,250,.18);animation-delay:-11s}
+  @keyframes drift{from{transform:translate3d(0,0,0) scale(1)}to{transform:translate3d(40px,-30px,0) scale(1.12)}}
+  @media (prefers-reduced-motion:reduce){.orb{animation:none}}
+
+  .wrap{max-width:1280px;margin:0 auto;padding:0 20px}
+
+  /* ---- hero ---- */
+  .hero{padding:64px 0 28px;text-align:center}
+  .badge{
+    display:inline-flex;align-items:center;gap:8px;
+    font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--cyan);
+    border:1px solid rgba(34,211,238,.4);
+    background:rgba(34,211,238,.08);
+    border-radius:999px;padding:7px 16px;
+    box-shadow:0 0 22px rgba(34,211,238,.22),inset 0 0 12px rgba(34,211,238,.08);
+  }
+  .badge .dot{width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan);animation:pulse 1.8s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+  @media (prefers-reduced-motion:reduce){.badge .dot{animation:none}}
+  h1{
+    margin:22px 0 12px;
+    font-size:clamp(2.1rem,6vw,3.6rem);
+    font-weight:900;letter-spacing:-.02em;line-height:1.05;
+    text-shadow:0 0 40px rgba(34,211,238,.35);
+  }
+  h1 .grad{
+    background:linear-gradient(92deg,var(--cyan) 0%,var(--violet) 45%,var(--pink) 100%);
+    -webkit-background-clip:text;background-clip:text;
+    -webkit-text-fill-color:transparent;color:transparent;
+  }
+  .sub{color:var(--muted);font-size:clamp(1rem,2.4vw,1.2rem);max-width:640px;margin:0 auto}
+  .sub b{color:var(--text);font-weight:700}
+
+  /* ---- filters ---- */
+  .filters{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin:30px 0 8px}
+  .filter{
+    appearance:none;cursor:pointer;
+    font:inherit;font-size:.9rem;font-weight:700;
+    color:var(--muted);background:var(--panel);
+    border:1px solid var(--line);border-radius:999px;
+    padding:9px 18px;transition:all .2s ease;
+  }
+  .filter span{
+    display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;
+    font-size:.72rem;background:rgba(148,163,255,.12);color:var(--text);
+  }
+  .filter:hover{color:var(--text);border-color:rgba(148,163,255,.4);transform:translateY(-1px)}
+  .filter.active{
+    color:#04121a;background:linear-gradient(92deg,var(--cyan),#5eead4);
+    border-color:transparent;box-shadow:0 0 24px rgba(34,211,238,.45);
+  }
+  .filter.active span{background:rgba(4,18,26,.18);color:#04121a}
+  .status{color:var(--muted);font-size:.85rem;margin:10px 0 26px}
+
+  /* ---- grid: 1 / 2 / 3 / 4 columns ---- */
+  .grid{display:grid;grid-template-columns:1fr;gap:18px;padding-bottom:56px}
+  @media (min-width:600px){.grid{grid-template-columns:repeat(2,1fr)}}
+  @media (min-width:920px){.grid{grid-template-columns:repeat(3,1fr)}}
+  @media (min-width:1240px){.grid{grid-template-columns:repeat(4,1fr)}}
+
+  /* ---- cards ---- */
+  .card{
+    display:flex;flex-direction:column;
+    background:linear-gradient(160deg,var(--panel2),var(--panel));
+    border:1px solid var(--line);
+    border-radius:18px;padding:20px;
+    position:relative;overflow:hidden;
+    transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease;
+  }
+  .card::before{
+    content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+    background:radial-gradient(280px 140px at 20% 0%,color-mix(in srgb,var(--ac) 14%,transparent),transparent 70%);
+    opacity:0;transition:opacity .22s ease;
+  }
+  .card:hover{transform:translateY(-4px);border-color:color-mix(in srgb,var(--ac) 55%,transparent);box-shadow:0 14px 40px -12px color-mix(in srgb,var(--ac) 35%,transparent)}
+  .card:hover::before{opacity:1}
+  .card.hide{display:none}
+  .icon{
+    width:56px;height:56px;border-radius:14px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:30px;line-height:1;
+    background:color-mix(in srgb,var(--ac) 12%,transparent);
+    border:1px solid color-mix(in srgb,var(--ac) 35%,transparent);
+    box-shadow:inset 0 0 18px color-mix(in srgb,var(--ac) 14%,transparent);
+  }
+  .card h2{font-size:1.12rem;font-weight:800;margin:14px 0 6px;letter-spacing:-.01em}
+  .card p{color:var(--muted);font-size:.88rem;line-height:1.55;flex:1}
+  .meta{margin:14px 0}
+  .tag{
+    display:inline-block;font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--ac);border:1px solid color-mix(in srgb,var(--ac) 45%,transparent);
+    background:color-mix(in srgb,var(--ac) 9%,transparent);
+    border-radius:999px;padding:4px 11px;
+  }
+  .play{
+    display:inline-flex;align-items:center;justify-content:center;gap:6px;
+    text-decoration:none;font-weight:800;font-size:.9rem;letter-spacing:.04em;
+    color:#04121a;background:linear-gradient(92deg,var(--ac),color-mix(in srgb,var(--ac) 55%,#fff));
+    border-radius:11px;padding:11px 16px;
+    box-shadow:0 4px 18px -4px color-mix(in srgb,var(--ac) 55%,transparent);
+    transition:filter .2s ease,transform .2s ease;
+  }
+  .play:hover{filter:brightness(1.12);transform:translateY(-1px)}
+  .play:focus-visible{outline:2px solid var(--ac);outline-offset:3px}
+  .card{animation:rise .5s ease backwards}
+  @keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+  @media (prefers-reduced-motion:reduce){.card{animation:none}.card:hover{transform:none}}
+
+  /* ---- footer ---- */
+  footer{
+    border-top:1px solid var(--line);
+    padding:28px 20px 40px;text-align:center;
+    color:var(--muted);font-size:.88rem;
+  }
+  footer .heart{color:var(--pink)}
+  footer .brand{color:var(--text);font-weight:700}
+</style>
+</head>
+<body>
+<div class="bg" aria-hidden="true">
+  <div class="orb a"></div><div class="orb b"></div><div class="orb c"></div>
+</div>
+
+<header class="hero wrap">
+  <div class="badge"><span class="dot" aria-hidden="true"></span> 23 GAMES · ALL FREE</div>
+  <h1>Shuangyueliao <span class="grad">Arcade</span></h1>
+  <p class="sub"><b>23 free browser games.</b> No installs, no ads-in-your-face, just play.</p>
+
+  <nav class="filters" aria-label="Filter games by genre">
+    <button class="filter active" data-f="all" type="button">All <span>23</span></button>
+    <button class="filter" data-f="puzzle" type="button">Puzzle <span>11</span></button>
+    <button class="filter" data-f="arcade" type="button">Arcade <span>8</span></button>
+    <button class="filter" data-f="action" type="button">Action <span>2</span></button>
+    <button class="filter" data-f="word" type="button">Word <span>1</span></button>
+    <button class="filter" data-f="idle" type="button">Idle <span>1</span></button>
+  </nav>
+  <p class="status" id="visible-count" role="status">Showing 23 of 23 games</p>
+</header>
+
+<main class="grid wrap" id="grid">
+
+  <article class="card" data-genre="puzzle" style="--ac:#22d3ee">
+    <div class="icon" aria-hidden="true">🧱</div>
+    <h2>Block Fall</h2>
+    <p>Guide falling tetrominoes, fill complete rows to clear them, and climb levels as the stack speeds up.</p>
+    <div class="meta"><span class="tag">Puzzle</span></div>
+    <a class="play" href="https://shuangyueliao.github.io/block-fall/">PLAY ▸</a>
+  </article>
+
+  <article class="card" data-genre="arcade" style="--ac:#f472b6">
+    <div class="icon" aria-hidden="true">🐍</div>
+    <h2>Neon Snake</h2>
+    <p>Classic snake reborn in neon: eat, grow, snatch the golden orb before it fades, and survive the speed-up.</p>
+    <div class="meta"><span class="tag">Arcade</span></div>
+    <a class="play" href="https://shuangyueliao.github.io/neon-snake/">PLAY ▸</a>
+  </article>
+
+  <article class="card" data-genre="word" style="--ac:#34d399">
+    <div class="icon" aria-hidden="true">📝</div>
+    <h2>Word Guess</h2>
+    <p>Guess the hidden five-letter word in six tries — green, yellow and gray tiles guide your next guess.</p>
+    <div class="meta"><span class="tag">Word</span></div>
+    <a class="play" href="https://shuangyueliao.github.io/word-guess/">PLAY ▸</a>
+  </article>
+
+  <article class="card" data-genre="puzzle" style="--ac:#22d3ee">
+    <div class="icon" aria-hidden="true">🔢</div>
+    <h2>Mini Sudoku</h2>
+    <p>Classic sudoku for everyone — 4×4, 6×6 or 9×9 grids, three difficulties, every puzzle has exactly one solution.</p>
+    <div class="meta"><span class="tag">Puzzle</span></div>
+    <a class="play" href="https://shuangyueliao.github.io/mini-sudoku/">PLAY ▸</a>
+  </article>
+
+  <article class="card" data-genre="puzzle" style="--ac:#22d3ee">
+    <div class="icon" aria-hidden="true">💣</div>
+    <h2>Mine Hunter</h2>
+    <p>Neon minesweeper with a guaranteed-safe first click — clear three field sizes and race your best time.</p>
+    <div class="meta"><span class="tag">Puzzle</span></div>
+    <a class="play" href="https://shuangyueliao.github.io/mine-hunter/">PLAY ▸</a>
+  </article>
+
+  <article class="card" data-genre="arcade" style="--ac:#f472b6">
+    <div class="icon" aria-hidden="true">🏓</div>
+    <h2>Neon Pong</h2>
+    <p>Classic pong reborn in neon: bend returns off your paddle edges and chain five clean hits to unleash FIREBALL.</p>
+    <div class="meta"><span class="tag">Arcade</span></div>
+    <a class="play" href="https://shuangyueliao.github.io/neon-pong/">PLAY ▸</a>
+  </article>
+
+  <article class="card" data-genre="action" style="--ac:#fb7185">
+    <div class="icon" aria-hidden="true">🌀</div>
+    <h2>Tunnel Run</h2>
+    <p>Steer a glowing orb down an endless neon tunnel, thread the shifting gates and grab shields to survive.</p>
+    <div class="meta"><span class="tag">Action</span></div>
+    <a class="play" href="https://shuangyueliao.github.io/tunnel-run/">PLAY ▸</a>
+  </article>
+
+  <article class="card" data-genre="arcade" style="--ac:#f472b6">
+    <div class="icon" aria-hidden="true">🐦</div>
+    <h2>Sky Hop</h2>
+    <p>Tap to flap a glowing bird through shrinking pipe gaps and chase bronze, silver and gold medals.</p>
+    <div class="meta"><span class="tag">Arcade</span></div>
+    <a class="play" href="https://shuangyueliao.github.io/sky-hop/">PLAY ▸</a>
+  </article>
+
+  <article class="card" data-genre="puzzle" style="--ac:#22d3ee">
+    <div class="icon" aria-hidden="true">🌈</div>
+    <h2>Color Flood</h2>
+    <p>Flood the board with one color: spread from the top-left tile and clear the grid within 25 moves.</p>
+    <div class="meta"><span class="tag">Puzzle</span></div>
+    <a class="play" href="https://shuangyueliao.github.io/color-flood/">PLAY ▸</a>
+  </article>
+
+  <article class="card" data-genre="puzzle" style="--ac:#22d3ee">
+    <div class="icon" aria-hidden="true">🔀</div>
+    <h2>Slide 15</h2>
+    <p>The classic sliding number puzzle: push whole rows and columns to restore the order on 3×3 to 5×5 boards.</p>
+    <div class="meta"><span class="tag">Puzzle</span></div>
+    <a class="play" href="https://shuangyueliao.github.io/slide-15/">PLAY ▸</a>
+  </article>
+
+  <article class="card" data-genre="puzzle" style="--ac:#22d3ee">
+    <div class="icon" aria-hidden="true">🔵</div>
+    <h2>Bubble Aim</h2>
+    <p>Aim, bounce and pop — match 3+ same-colored bubbles, drop loose clusters for bonus points, clear the hex board.</p>
+    <div class="meta"><span class="tag">Puzzle</span></div>
+    <a class="play" href="https://shuangyueliao.github.io/bubble-aim/">PLAY ▸</a>
+  </article>
+
+  <article class="card" data-genre="action" style="--ac:#fb7185">
+    <div class="icon" aria-hidden="true">🚀</div>
+    <h2>Star Shooter</h2>
+    <p>Classic vector space shooter: rotate, thrust and blast asteroid waves, then hunt flying saucers for +200.</p>
+    <div class="meta"><span class="tag">Action</span></div>
+    <a class="play" href="https://shuangyueliao.github.io/star-shooter/">PLAY ▸</a>
+  </article>
+
+  <article class="card" data-genre="arcade" style="--ac:#f472b6">
+    <div class="icon" aria-hidden="true">☁️</div>
+    <h2>Cloud Hop</h2>
+    <p>Bounce your ball up an endless sky — land on crumbling, sliding and vanishing platforms, and don't fall!</p>
+    <div class="meta"><span class="tag">Arcade</span></div>
+    <a class="play" href="https://shuangyueliao.github.io/cloud-hop/">PLAY ▸</a>
+  </article>
+
+  <article class="card" data-genre="arcade" style="--ac:#f472b6">
+    <div class="icon" aria-hidden="true">🔨</div>
+    <h2>Mole Whack</h2>
+    <p>Whack goofy moles for 30 seconds, chain combo hits, grab golden moles for triple points and dodge the bombs.</p>
+    <div class="meta"><span class="tag">Arcade</span></div>
+    <a class="play" href="https://shuangyueliao.github.io/mole-whack/">PLAY ▸</a>
+  </article>
+
+  <article class="card" data-genre="puzzle" style="--ac:#22d3ee">
+    <div class="icon" aria-hidden="true">🀄</div>
+    <h2>Tile Link</h2>
+    <p>Tap two matching tiles with a link that turns at most twice — pop the pairs and clear the board before time runs out.</p>
+    <div class="meta"><span class="tag">Puzzle</span></div>
+    <a class="play" href="https://shuangyueliao.github.io/tile-link/">PLAY ▸</a>
+  </article>
+
+  <article class="card" data-genre="puzzle" style="--ac:#22d3ee">
+    <div class="icon" aria-hidden="true">💡</div>
+    <h2>Light Shift</h2>
+    <p>A glowing Lights Out puzzle: tap a tile to flip it with its neighbours and switch off the whole grid.</p>
+    <div class="meta"><span class="tag">Puzzle</span></div>
+    <a class="play" href="https://shuangyueliao.github.io/light-shift/">PLAY ▸</a>
+  </article>
+
+  <article class="card" data-genre="arcade" style="--ac:#f472b6">
+    <div class="icon" aria-hidden="true">🗡️</div>
+    <h2>Blade Toss</h2>
+    <p>Throw knives into the spinning log — never hit one already stuck — and survive a tricky boss log every 5th level.</p>
+    <div class="meta"><span class="tag">Arcade</span></div>
+    <a class="play" href="https://shuangyueliao.github.io/blade-toss/">PLAY ▸</a>
+  </article>
+
+  <article class="card" data-genre="puzzle" style="--ac:#22d3ee">
+    <div class="icon" aria-hidden="true">🧩</div>
+    <h2>Flow Pipes</h2>
+    <p>Drag between matching dots to draw glowing pipes and connect every pair — 30 relaxing levels, no timers.</p>
+    <div class="meta"><span class="tag">Puzzle</span></div>
+    <a class="play" href="https://shuangyueliao.github.io/flow-pipes/">PLAY ▸</a>
+  </article>
+
+  <article class="card" data-genre="puzzle" style="--ac:#22d3ee">
+    <div class="icon" aria-hidden="true">🎵</div>
+    <h2>Echo Pads</h2>
+    <p>A Simon-style memory game: watch six glowing pads play a growing melody, then repeat it by ear.</p>
+    <div class="meta"><span class="tag">Puzzle</span></div>
+    <a class="play" href="https://shuangyueliao.github.io/echo-pads/">PLAY ▸</a>
+  </article>
+
+  <article class="card" data-genre="arcade" style="--ac:#f472b6">
+    <div class="icon" aria-hidden="true">🏗️</div>
+    <h2>Tower Stack</h2>
+    <p>A block swings left and right — tap to drop it on the tower. Overhang gets sliced off; land perfectly to regrow width.</p>
+    <div class="meta"><span class="tag">Arcade</span></div>
+    <a class="play" href="https://shuangyueliao.github.io/tower-stack/">PLAY ▸</a>
+  </article>
+
+  <article class="card" data-genre="arcade" style="--ac:#f472b6">
+    <div class="icon" aria-hidden="true">🕹️</div>
+    <h2>Neon Breakout</h2>
+    <p>Classic brick breaker with neon glow effects, 3 handcrafted levels, combo scoring and 3 lives.</p>
+    <div class="meta"><span class="tag">Arcade</span></div>
+    <a class="play" href="https://shuangyueliao.github.io/neon-breakout/">PLAY ▸</a>
+  </article>
+
+  <article class="card" data-genre="puzzle" style="--ac:#22d3ee">
+    <div class="icon" aria-hidden="true">🎯</div>
+    <h2>Drop Merge</h2>
+    <p>Drop numbered tiles, merge identical neighbours and chase combos in this free falling-number puzzle.</p>
+    <div class="meta"><span class="tag">Puzzle</span></div>
+    <a class="play" href="https://shuangyueliao.github.io/drop-merge-game/">PLAY ▸</a>
+  </article>
+
+  <article class="card" data-genre="idle" style="--ac:#fbbf24">
+    <div class="icon" aria-hidden="true">⚒️</div>
+    <h2>Idle Forge</h2>
+    <p>Strike the anvil to forge gold, then automate your smithy and hit milestones to craft legendary gear.</p>
+    <div class="meta"><span class="tag">Idle</span></div>
+    <a class="play" href="https://shuangyueliao.github.io/idle-forge/">PLAY ▸</a>
+  </article>
+
+</main>
+
+<footer>
+  <p><span class="brand">Shuangyueliao Labs</span> — 23 free single-file HTML5 games, made with <span class="heart">♥</span> and zero external assets.</p>
+  <p>© 2026 Shuangyueliao Labs · Games are free to play</p>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+  var buttons = Array.prototype.slice.call(document.querySelectorAll('.filter'));
+  var cards = Array.prototype.slice.call(document.querySelectorAll('.card'));
+  var status = document.getElementById('visible-count');
+  var total = cards.length;
+
+  function apply(genre) {
+    var shown = 0;
+    cards.forEach(function (card) {
+      var show = genre === 'all' || card.getAttribute('data-genre') === genre;
+      card.classList.toggle('hide', !show);
+      if (show) { shown += 1; }
+    });
+    status.textContent = 'Showing ' + shown + ' of ' + total + ' games';
+  }
+
+  buttons.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      buttons.forEach(function (b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      apply(btn.getAttribute('data-f'));
+    });
+  });
+
+  apply('all');
+})();
+</script>
+</body>
+</html>
